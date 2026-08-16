@@ -11,3 +11,5 @@ function MenuItem() {
     </div>
   )
 }
+
+export default MenuItem
