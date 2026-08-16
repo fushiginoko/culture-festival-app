@@ -1,4 +1,4 @@
-function MenuItem(props) {
+function MenuItem(props: any) {
 
   return (
     <div>
