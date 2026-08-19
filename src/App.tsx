@@ -1,10 +1,10 @@
 import './App.css'
-import MenuList from './components/MenuList'
+import MenuPage from './pages/MenuPage'
 
 function App() {
   return (
     <>
-      <MenuList />
+      <MenuPage />
     </>
   )
 }
