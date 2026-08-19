@@ -1,6 +1,6 @@
 import MenuItem from "./MenuItem"
 
-interface MenuItem {
+export interface MenuItem {
   id: number;
   name: string;
   price: number;
