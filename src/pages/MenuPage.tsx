@@ -18,6 +18,7 @@ function MenuPage() {
   return (
     <div>
       <MenuList items={menuItems} />
+      <CartSummary items={menuItems} />
     </div>
   )
 }
