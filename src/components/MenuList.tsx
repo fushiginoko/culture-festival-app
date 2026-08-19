@@ -1,12 +1,8 @@
 import MenuItem from "./MenuItem"
+import type { MenuItemProps } from "./MenuItem"
 
-export interface MenuItem {
-  id: number;
-  name: string;
-  price: number;
-}
 
-function MenuList(props: { items: MenuItem[] }) {
+function MenuList(props: { items: MenuItemProps[] }) {
   return (
     <div>
       {props.items.map((item) => (
@@ -14,6 +10,8 @@ function MenuList(props: { items: MenuItem[] }) {
           key={item.id}
           name={item.name}
           price={item.price}
+          count={item.count}
+          onChange={item.onChange}
         />
       ))}
     </div>
