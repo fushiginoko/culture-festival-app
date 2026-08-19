@@ -8,6 +8,7 @@ function MenuList(props: { items: MenuItemProps[] }) {
       {props.items.map((item) => (
         <MenuItem
           key={item.id}
+          id={item.id}
           name={item.name}
           price={item.price}
           count={item.count}
