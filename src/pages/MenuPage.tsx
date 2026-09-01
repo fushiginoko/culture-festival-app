@@ -6,6 +6,7 @@ import type { MenuItemProps } from "../components/MenuItem";
 // count と onChange を除いた「元データ」の型
 type MenuItemData = Omit<MenuItemProps, "count" | "onChange">;
 
+// 仮の値
 const MENU_DATA: MenuItemData[] = [
   { id: 1, name: "ハンバーガー", price: 300 },
   { id: 2, name: "フライドチキン", price: 400 },
