@@ -58,10 +58,44 @@ function clearStoredTicket() {
 
 function PickupTimePage() {
   const location = useLocation();
-  const state = location.state as { selectedItems: OrderItem[] } | undefined;
-  const selectedItems = state?.selectedItems ?? [];
+  const navigate = useNavigate();
+  const state = location.state as LocationState;
+  const cartItems = state?.selectedItems ?? [];
 
-  if (selectedItems.length === 0) {
+  // 初回マウント時に保存済みチケットがあれば即座に復元する
+  const [ticket, setTicket] = useState<Ticket | null>(() => readStoredTicket());
+  const [slots, setSlots] = useState<TimeSlot[]>([]);
+  const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
+  const [view, setView] = useState<ViewState>(() => (ticket ? "confirmed" : "loading"));
+  const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    // 復元済みチケットがある場合や、カートが空の場合は枠の取得を行わない
+    if (ticket || cartItems.length === 0) return;
+
+    let cancelled = false;
+    fetchTimeSlots()
+      .then((data) => {
+        if (cancelled) return;
+        setSlots(data);
+        setView("ready");
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setErrorMessage(
+          "受け取り時間の空き状況を取得できませんでした。電波の良い場所でもう一度お試しください。"
+        );
+        setView("error");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ticket, cartItems.length]);
+
+  // カートが空でも、復元できるチケットがあればメニューへは戻さない
+  if (!ticket && cartItems.length === 0) {
     return <Navigate to="/" replace />;
   }
 
