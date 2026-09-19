@@ -1,10 +1,16 @@
-import { useLocation, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate, Navigate } from "react-router-dom";
+import type { OrderItem, SlotStatus, TimeSlot } from "./types";
+import { fetchTimeSlots, submitOrder } from "./pickupApi";
+import "./PickupTimePage.css";
 
-type OrderItem = {
-  id: number;
-  name: string;
-  price: number;
-  count: number;
+type LocationState = { selectedItems: OrderItem[] } | undefined;
+type ViewState = "loading" | "ready" | "submitting" | "error" | "confirmed";
+
+type Ticket = {
+  code: string;
+  items: OrderItem[];
+  pickupTime: string; // フル表記。例: "10:00〜10:15"
 };
 
 function PickupTimePage() {
