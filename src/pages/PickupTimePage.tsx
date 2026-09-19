@@ -12,6 +12,10 @@ function PickupTimePage() {
   const state = location.state as { selectedItems: OrderItem[] } | undefined;
   const selectedItems = state?.selectedItems ?? [];
 
+  if (selectedItems.length === 0) {
+    return <Navigate to="/" replace />;
+  }
+
   return (
     <>
 
