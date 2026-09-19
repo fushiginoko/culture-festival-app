@@ -15,7 +15,7 @@ function CartSummary(props: CartSummaryProps) {
       <p>合計: {total}円</p>
 
       {/* 1個以上注文を受けていないと押せないボタン */}
-      <button onClick={() => onSelectTime} disabled={totalCount === 0}>
+      <button onClick={onSelectTime} disabled={totalCount === 0}>
         {totalCount === 0 ? "商品を選択してください" : "受取時間を選ぶ"}
       </button>
     </div>
