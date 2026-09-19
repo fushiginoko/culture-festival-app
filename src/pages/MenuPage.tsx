@@ -3,8 +3,6 @@ import MenuList from "../components/MenuList";
 import CartSummary from "../components/CartSummary";
 import type { MenuItemProps } from "../components/MenuItem";
 import { useNavigate } from "react-router-dom";
-import { BrowserRouter, Route, Routes } from "react-router";
-import PickupTimePage from "./PickupTimePage";
 
 // count と onChange を除いた「元データ」の型
 type MenuItemData = Omit<MenuItemProps, "count" | "onChange">;
