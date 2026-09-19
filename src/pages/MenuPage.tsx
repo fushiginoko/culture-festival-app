@@ -32,10 +32,20 @@ function MenuPage() {
     onChange: (newCount: number) => handleChange(item.id, newCount),
   }));
 
+  const handleSelectTime = () => {
+    const selectedItems = menuItems.filter((item) => item.count > 0).map((item) => ({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      count: item.count,
+    }));
+    navigate("/pickup-time", { state: { selectedItems } });
+  };
+
   return (
     <div>
       <MenuList items={menuItems} />
-      <CartSummary items={menuItems} onSelectTime={() => navigate("/pickup-time")} />
+      <CartSummary items={menuItems} onSelectTime={handleSelectTime} />
     </div>
   );
 }
