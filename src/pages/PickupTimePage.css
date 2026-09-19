@@ -1,0 +1,297 @@
+.pickup-page {
+  --color-bg: #fbf6ec;
+  --color-ink: #2b2620;
+  --color-ink-soft: #6b6255;
+  --color-heading: #1c1712;
+  --color-accent: #a63d2f;
+  --color-accent-ink: #fbf6ec;
+  --color-line: rgba(43, 38, 32, 0.14);
+
+  --status-many-bg: #e4f1ea;
+  --status-many-ink: #114b37;
+  --status-some-bg: #fbf0d6;
+  --status-some-ink: #6e5200;
+  --status-few-bg: #fbe7da;
+  --status-few-ink: #85330a;
+  --status-full-bg: #ede8e7;
+  --status-full-ink: #7d7572;
+
+  --font-display: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Rounded Mplus 1c",
+    sans-serif;
+  --font-body: "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", "Noto Sans JP",
+    sans-serif;
+
+  min-height: 100vh;
+  box-sizing: border-box;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  padding: 24px 20px 120px;
+}
+
+.pickup-page *,
+.pickup-page *::before,
+.pickup-page *::after {
+  box-sizing: inherit;
+}
+
+.pickup-page h1 {
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 800;
+  color: var(--color-heading);
+  margin: 4px 0 20px;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  font-size: 13px;
+  color: var(--color-ink-soft);
+  margin-bottom: 16px;
+}
+
+/* 1行4列のグリッド：行内はくっつき、行間は離す */
+.time-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  row-gap: 12px;
+  column-gap: 0;
+}
+
+.time-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid var(--color-line);
+  border-radius: 0;
+  border-right-width: 0;
+  background: #fff;
+  padding: 10px 4px;
+  font-family: var(--font-body);
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, z-index 0.12s ease;
+}
+
+/* 各行の末尾（右端）の右枠線 */
+.time-slot:nth-child(4n) {
+  border-right-width: 1px;
+}
+
+/* 最後の要素が4の倍数で終わらない場合の右枠線 */
+.time-slot:last-child {
+  border-right-width: 1px;
+}
+
+.time-slot:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  z-index: 2;
+}
+
+.time-slot__label {
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+
+.time-slot__status {
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.time-slot--many {
+  background: var(--status-many-bg);
+  color: var(--status-many-ink);
+}
+.time-slot--some {
+  background: var(--status-some-bg);
+  color: var(--status-some-ink);
+}
+.time-slot--few {
+  background: var(--status-few-bg);
+  color: var(--status-few-ink);
+}
+.time-slot--full {
+  background: var(--status-full-bg);
+  color: var(--status-full-ink);
+  border-color: rgba(43, 38, 32, 0.08);
+  cursor: not-allowed;
+  opacity: 0.45;
+  box-shadow: none;
+}
+
+.time-slot--selected {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px var(--color-accent) inset;
+  transform: translateY(-1px);
+  z-index: 1;
+}
+
+.time-slot:disabled {
+  pointer-events: none;
+}
+
+.error-banner {
+  background: var(--status-full-bg);
+  color: var(--status-full-ink);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.error-banner button {
+  margin-top: 8px;
+  border: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* 下からにゅっと出てくる確定バー（フル表記のまま） */
+.confirm-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--color-ink);
+  padding: 14px 20px calc(14px + env(safe-area-inset-bottom, 0px));
+  transform: translateY(100%);
+  transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.confirm-bar--visible {
+  transform: translateY(0);
+}
+
+.confirm-bar__inner {
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.confirm-bar__inner span {
+  color: var(--color-bg);
+  font-size: 14px;
+}
+
+.confirm-button {
+  font-family: var(--font-display);
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  border: none;
+  border-radius: 999px;
+  padding: 12px 22px;
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.confirm-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 予約確定後のチケット画面 */
+.pickup-page--confirmed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-top: 48px;
+}
+
+.ticket-instruction {
+  color: var(--color-ink-soft);
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.auth-code {
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  background: #fff;
+  border: 2px dashed var(--color-accent);
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin: 20px 0;
+  color: var(--color-accent);
+}
+
+.pickup-time {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.order-summary {
+  list-style: none;
+  padding: 14px 18px;
+  margin: 0 0 20px;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.6;
+  color: var(--color-ink);
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(43, 38, 32, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 340px;
+  width: 100%;
+}
+
+.order-summary li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed rgba(43, 38, 32, 0.12);
+  padding-bottom: 6px;
+}
+
+.order-summary li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.note {
+  font-size: 13px;
+  color: var(--color-ink-soft);
+  max-width: 320px;
+  margin-bottom: 28px;
+}
+
+.new-order-button {
+  font-family: var(--font-body);
+  background: transparent;
+  color: var(--color-ink-soft);
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.new-order-button:hover {
+  color: var(--color-ink);
+  border-color: var(--color-ink);
+}
