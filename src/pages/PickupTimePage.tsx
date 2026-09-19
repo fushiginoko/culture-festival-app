@@ -99,8 +99,10 @@ function PickupTimePage() {
     return <Navigate to="/" replace />;
   }
 
-  return (
-    <>
+  const handleSelectSlot = (slot: TimeSlot) => {
+    if (slot.status === "full" || view === "submitting") return;
+    setSelectedSlot((prev) => (prev && prev.start === slot.start ? null : slot));
+  };
 
     </>
   );
