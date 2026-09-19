@@ -5,8 +5,7 @@ interface CartSummaryProps {
   onSelectTime: () => void;
 }
 
-function CartSummary(props: CartSummaryProps) {
-  const { items, onSelectTime } = props;
+function CartSummary({ items, onSelectTime }: CartSummaryProps) {
   const total = items.reduce((acc, item) => acc + item.price * item.count, 0);
   const totalCount = items.reduce((acc, item) => acc + item.count, 0);
 
