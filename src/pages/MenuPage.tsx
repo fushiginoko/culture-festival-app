@@ -2,6 +2,9 @@ import { useState } from "react";
 import MenuList from "../components/MenuList";
 import CartSummary from "../components/CartSummary";
 import type { MenuItemProps } from "../components/MenuItem";
+import { useNavigate } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router";
+import PickupTimePage from "./PickupTimePage";
 
 // count と onChange を除いた「元データ」の型
 type MenuItemData = Omit<MenuItemProps, "count" | "onChange">;
@@ -14,6 +17,8 @@ const MENU_DATA: MenuItemData[] = [
 ];
 
 function MenuPage() {
+  const navigate = useNavigate();
+
   // idごとのcountをオブジェクトで一括管理
   const [counts, setCounts] = useState<Record<number, number>>(
     Object.fromEntries(MENU_DATA.map((item) => [item.id, 0]))
@@ -32,7 +37,7 @@ function MenuPage() {
   return (
     <div>
       <MenuList items={menuItems} />
-      <CartSummary items={menuItems} />
+      <CartSummary items={menuItems} onSelectTime={() => navigate("/pickup-time")} />
     </div>
   );
 }
