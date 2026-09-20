@@ -1,27 +1,15 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, Navigate } from "react-router-dom";
-import type { OrderItem, SlotStatus, TimeSlot } from "./types";
+import type { OrderItem, TimeSlot } from "./types";
 import { fetchTimeSlots, submitOrder } from "./pickupApi";
-import { readStoredTicket, saveTicket, clearStoredTicket } from "./ticketStorage";
+import { saveTicket } from "./ticketStorage";
+import TimeSlotGrid from "../components/TimeSlotGrid";
+import OrderConfirmBar from "../components/OrderConfirmBar";
 import type { Ticket } from "./ticketStorage";
 import "./PickupTimePage.css";
 
 type LocationState = { selectedItems: OrderItem[] } | undefined;
-type ViewState = "loading" | "ready" | "submitting" | "error" | "confirmed";
-
-const STATUS_LABEL: Record<SlotStatus, string> = {
-  many: "◎",
-  some: "○",
-  few: "△",
-  full: "×",
-};
-
-const STATUS_TEXT: Record<SlotStatus, string> = {
-  many: "空きあり",
-  some: "やや混雑",
-  few: "残りわずか",
-  full: "満枠",
-};
+type ViewState = "loading" | "ready" | "submitting" | "error";
 
 function PickupTimePage() {
   const location = useLocation();
@@ -29,18 +17,14 @@ function PickupTimePage() {
   const state = location.state as LocationState;
   const cartItems = state?.selectedItems ?? [];
 
-  // 保存済みチケットがあれば、カートの内容に関わらず常にそれを優先して復元する。
-  // 「新しく注文する」ボタンを押して初めてチケットをクリアし、
-  // 新規注文の時間選択に進めるようにする。
-  const [ticket, setTicket] = useState<Ticket | null>(() => readStoredTicket());
   const [slots, setSlots] = useState<TimeSlot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
-  const [view, setView] = useState<ViewState>(() => (ticket ? "confirmed" : "loading"));
+  const [view, setView] = useState<ViewState>("loading");
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    // 復元済みチケットがある場合や、カートが空の場合は枠の取得を行わない
-    if (ticket || cartItems.length === 0) return;
+    // カートが空の場合は枠の取得を行わない
+    if (cartItems.length === 0) return;
 
     let cancelled = false;
     fetchTimeSlots()
@@ -61,10 +45,9 @@ function PickupTimePage() {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ticket, cartItems.length]);
+  }, [cartItems.length]);
 
-  // カートが空でも、復元できるチケットがあればメニューへは戻さない
-  if (!ticket && cartItems.length === 0) {
+  if (cartItems.length === 0) {
     return <Navigate to="/" replace />;
   }
 
@@ -88,8 +71,7 @@ function PickupTimePage() {
           pickupTime: `${selectedSlot.start}〜${selectedSlot.end}`,
         };
         saveTicket(newTicket);
-        setTicket(newTicket);
-        setView("confirmed");
+        navigate("/ticket", { replace: true });
         return;
       }
 
@@ -111,52 +93,6 @@ function PickupTimePage() {
     }
   };
 
-  const handleStartNewOrder = () => {
-    const okToProceed = window.confirm(
-      "スクリーンショットは保存しましたか？（新しい注文に進むと現在の画面はリセットされます）"
-    );
-    if (!okToProceed) return;
-    clearStoredTicket();
-    navigate("/", { replace: true });
-  };
-
-  // ── 予約確定後：認証コードのチケット画面 ──────────────────
-  if (view === "confirmed" && ticket) {
-    return (
-      <div className="pickup-page pickup-page--confirmed">
-        <h1>予約が完了しました</h1>
-        <p className="ticket-instruction">
-          この画面をスクリーンショットして保存してください。
-        </p>
-        <div className="auth-code" aria-label={`認証コード ${ticket.code}`}>
-          {ticket.code}
-        </div>
-        <p className="pickup-time">受け取り時間：{ticket.pickupTime}</p>
-        <ul className="order-summary">
-          {ticket.items.map((item) => (
-            <li key={item.id}>
-              {item.name} × {item.count}
-            </li>
-          ))}
-        </ul>
-        <p className="note">
-          受け取りの際は、この画面またはスクリーンショットを見せるか、
-          コードを口頭で伝えてください。
-        </p>
-        <button
-          type="button"
-          className="new-order-button"
-          onClick={handleStartNewOrder}
-        >
-          別の商品を新しく注文する
-        </button>
-      </div>
-    );
-  }
-
-  const allFull = slots.length > 0 && slots.every((s) => s.status === "full");
-
-  // ── 時間指定グリッド画面 ──────────────────────────────
   return (
     <div className="pickup-page">
       <h1>受け取り時間を選んでください</h1>
@@ -175,63 +111,20 @@ function PickupTimePage() {
       {(view === "ready" || view === "submitting") && (
         <>
           {errorMessage && <p className="error-banner">{errorMessage}</p>}
-
-          <div className="legend">
-            <span>◎ 空きあり</span>
-            <span>○ やや混雑</span>
-            <span>△ 残りわずか</span>
-            <span>× 満枠</span>
-          </div>
-
-          {allFull && (
-            <p className="error-banner">
-              本日の受け取り枠はすべて埋まってしまいました。スタッフにお声がけください。
-            </p>
-          )}
-
-          <div className="time-grid">
-            {slots.map((slot) => {
-              const isSelected =
-                selectedSlot?.start === slot.start && selectedSlot?.end === slot.end;
-              return (
-                <button
-                  key={slot.start}
-                  type="button"
-                  className={`time-slot time-slot--${slot.status} ${
-                    isSelected ? "time-slot--selected" : ""
-                  }`}
-                  disabled={slot.status === "full" || view === "submitting"}
-                  aria-pressed={isSelected}
-                  aria-label={`${slot.start}から${slot.end}、${STATUS_TEXT[slot.status]}`}
-                  onClick={() => handleSelectSlot(slot)}
-                >
-                  {/* グリッド上は開始時刻のみの簡略表記。フル表記は確定バー／チケット側で表示 */}
-                  <span className="time-slot__label">{slot.start}〜</span>
-                  <span className="time-slot__status" aria-hidden="true">
-                    {STATUS_LABEL[slot.status]}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+          <TimeSlotGrid
+            slots={slots}
+            selectedSlot={selectedSlot}
+            disabled={view === "submitting"}
+            onSelect={handleSelectSlot}
+          />
         </>
       )}
 
-      <div className={`confirm-bar ${selectedSlot ? "confirm-bar--visible" : ""}`}>
-        <div className="confirm-bar__inner">
-          <span>
-            {selectedSlot ? `${selectedSlot.start}〜${selectedSlot.end} で受け取る` : ""}
-          </span>
-          <button
-            type="button"
-            className="confirm-button"
-            disabled={!selectedSlot || view === "submitting"}
-            onClick={handleConfirm}
-          >
-            {view === "submitting" ? "送信中…" : "注文を確定する"}
-          </button>
-        </div>
-      </div>
+      <OrderConfirmBar
+        selectedSlot={selectedSlot}
+        submitting={view === "submitting"}
+        onConfirm={handleConfirm}
+      />
     </div>
   );
 }
