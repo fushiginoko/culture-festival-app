@@ -1,3 +1,5 @@
+import { MAX_ITEM_QUANTITY } from "../lib/constants";
+
 export type MenuItemProps = {
   id: number;
   name: string;
@@ -11,7 +13,7 @@ function MenuItem({ name, price, count, onChange }: MenuItemProps) {
     if (count > 0) onChange(count - 1);
   };
   const handleIncrement = () => {
-    if (count < 9) onChange(count + 1);
+    if (count < MAX_ITEM_QUANTITY) onChange(count + 1);
   };
 
   return (
@@ -25,7 +27,11 @@ function MenuItem({ name, price, count, onChange }: MenuItemProps) {
           −
         </button>
         <span className="count-display">{count}</span>
-        <button onClick={handleIncrement} disabled={count >= 9} aria-label="増やす">
+        <button
+          onClick={handleIncrement}
+          disabled={count >= MAX_ITEM_QUANTITY}
+          aria-label="増やす"
+        >
           ＋
         </button>
       </div>

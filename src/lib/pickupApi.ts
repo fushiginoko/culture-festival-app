@@ -1,29 +1,42 @@
 import type { OrderItem, SlotStatus, TimeSlot } from "../types";
 import { generateAuthCode } from "./crockfordBase32";
-
-// ▼ 営業時間・枠の設定（実際の文化祭のスケジュールに合わせて変更してください）
-const OPEN_HOUR = 10;
-const OPEN_MINUTE = 0;
-const CLOSE_HOUR = 15;
-const CLOSE_MINUTE = 0;
-const SLOT_MINUTES = 15;
-const CAPACITY_PER_SLOT = 8; // 1枠あたりの受付上限人数
+import {
+  AUTH_CODE_LENGTH,
+  DEMO_RESERVED_CAPACITY_BUFFER,
+  DEMO_SLOT_FULL_PROBABILITY,
+  MINUTES_PER_HOUR,
+  PICKUP_CLOSE_HOUR,
+  PICKUP_CLOSE_MINUTE,
+  PICKUP_OPEN_HOUR,
+  PICKUP_OPEN_MINUTE,
+  PICKUP_SLOT_CAPACITY,
+  PICKUP_SLOT_DURATION_MINUTES,
+  ORDER_SUBMIT_DELAY_MS,
+  SLOT_STATUS_FULL_THRESHOLD,
+  SLOT_STATUS_FEW_THRESHOLD,
+  SLOT_STATUS_SOME_THRESHOLD,
+  TIME_LABEL_DIGITS,
+  TIME_SLOTS_FETCH_DELAY_MS,
+} from "./constants";
 
 function pad(n: number): string {
-  return n.toString().padStart(2, "0");
+  return n.toString().padStart(TIME_LABEL_DIGITS, "0");
 }
 
 function generateSlotLabels(): { start: string; end: string }[] {
   const labels: { start: string; end: string }[] = [];
-  let h = OPEN_HOUR;
-  let m = OPEN_MINUTE;
+  let h = PICKUP_OPEN_HOUR;
+  let m = PICKUP_OPEN_MINUTE;
 
-  while (h < CLOSE_HOUR || (h === CLOSE_HOUR && m < CLOSE_MINUTE)) {
+  while (
+    h < PICKUP_CLOSE_HOUR ||
+    (h === PICKUP_CLOSE_HOUR && m < PICKUP_CLOSE_MINUTE)
+  ) {
     const start = `${pad(h)}:${pad(m)}`;
-    let nextM = m + SLOT_MINUTES;
+    let nextM = m + PICKUP_SLOT_DURATION_MINUTES;
     let nextH = h;
-    if (nextM >= 60) {
-      nextM -= 60;
+    if (nextM >= MINUTES_PER_HOUR) {
+      nextM -= MINUTES_PER_HOUR;
       nextH += 1;
     }
     labels.push({ start, end: `${pad(nextH)}:${pad(nextM)}` });
@@ -34,9 +47,9 @@ function generateSlotLabels(): { start: string; end: string }[] {
 }
 
 function statusFromRatio(ratio: number): SlotStatus {
-  if (ratio >= 1) return "full";
-  if (ratio >= 0.8) return "few";
-  if (ratio >= 0.5) return "some";
+  if (ratio >= SLOT_STATUS_FULL_THRESHOLD) return "full";
+  if (ratio >= SLOT_STATUS_FEW_THRESHOLD) return "few";
+  if (ratio >= SLOT_STATUS_SOME_THRESHOLD) return "some";
   return "many";
 }
 
@@ -52,10 +65,16 @@ function wait(ms: number) {
  * 今はデモ用にランダムな空き状況を返しています。
  */
 export async function fetchTimeSlots(): Promise<TimeSlot[]> {
-  await wait(400);
+  await wait(TIME_SLOTS_FETCH_DELAY_MS);
   return generateSlotLabels().map(({ start, end }) => {
-    const reserved = Math.floor(Math.random() * (CAPACITY_PER_SLOT + 2));
-    return { start, end, status: statusFromRatio(reserved / CAPACITY_PER_SLOT) };
+    const reserved = Math.floor(
+      Math.random() * (PICKUP_SLOT_CAPACITY + DEMO_RESERVED_CAPACITY_BUFFER)
+    );
+    return {
+      start,
+      end,
+      status: statusFromRatio(reserved / PICKUP_SLOT_CAPACITY),
+    };
   });
 }
 
@@ -78,14 +97,14 @@ export async function submitOrder(
   items: OrderItem[],
   slot: Pick<TimeSlot, "start" | "end">
 ): Promise<SubmitOrderResult> {
-  await wait(600);
+  await wait(ORDER_SUBMIT_DELAY_MS);
   void items; // 実装時はここでリクエストボディに含める
   void slot; // 実装時はここでリクエストボディに含める
 
   // デモ用: まれに「ちょうど満枠になってしまった」ケースを再現
-  if (Math.random() < 0.05) {
+  if (Math.random() < DEMO_SLOT_FULL_PROBABILITY) {
     return { ok: false, reason: "slot_full" };
   }
 
-  return { ok: true, authCode: generateAuthCode(6) };
+  return { ok: true, authCode: generateAuthCode(AUTH_CODE_LENGTH) };
 }

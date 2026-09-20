@@ -1,12 +1,11 @@
 import type { OrderItem } from "../types";
+import { TICKET_STORAGE_KEY } from "./constants";
 
 export type Ticket = {
   code: string;
   items: OrderItem[];
   pickupTime: string; // フル表記。例: "10:00〜10:15"
 };
-
-const STORAGE_KEY = "bunkasai-order-ticket";
 
 /**
  * 保存済みのチケットを読み込む。
@@ -15,7 +14,7 @@ const STORAGE_KEY = "bunkasai-order-ticket";
  */
 export function readStoredTicket(): Ticket | null {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(TICKET_STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<Ticket> & { createdAt?: string };
     if (
@@ -36,7 +35,7 @@ export function readStoredTicket(): Ticket | null {
 export function saveTicket(ticket: Ticket) {
   try {
     localStorage.setItem(
-      STORAGE_KEY,
+      TICKET_STORAGE_KEY,
       JSON.stringify({ ...ticket, createdAt: new Date().toISOString() })
     );
   } catch {
@@ -47,7 +46,7 @@ export function saveTicket(ticket: Ticket) {
 /** 「新しく注文する」を選んだときなどにチケットを消す。 */
 export function clearStoredTicket() {
   try {
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(TICKET_STORAGE_KEY);
   } catch {
     // 失敗しても致命的ではないので握りつぶす
   }
