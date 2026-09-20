@@ -3,7 +3,7 @@ import MenuList from "../components/MenuList";
 import CartSummary from "../components/CartSummary";
 import type { MenuItemProps } from "../components/MenuItem";
 import { useNavigate, Navigate } from "react-router-dom";
-import { readStoredTicket } from "./ticketStorage";
+import { readStoredTicket } from "../lib/ticketStorage";
 
 // count と onChange を除いた「元データ」の型
 type MenuItemData = Omit<MenuItemProps, "count" | "onChange">;
@@ -44,10 +44,10 @@ function MenuPage() {
   };
 
   // すでに確定済みのチケットがある場合は、メニューを選ばせず
-  // チケット画面（受け取り時間ページの確定後表示）へ直接飛ばす。
+  // すでに確定済みのチケットがある場合は、チケット画面へ直接飛ばす。
   // 新しい注文はチケット画面の「新しく注文する」ボタンから始めてもらう。
   if (readStoredTicket()) {
-    return <Navigate to="/pickup-time" replace />;
+    return <Navigate to="/ticket" replace />;
   }
 
   return (

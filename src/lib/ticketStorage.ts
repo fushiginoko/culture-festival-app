@@ -1,4 +1,4 @@
-import type { OrderItem } from "./types";
+import type { OrderItem } from "../types";
 
 export type Ticket = {
   code: string;
@@ -11,7 +11,7 @@ const STORAGE_KEY = "bunkasai-order-ticket";
 /**
  * 保存済みのチケットを読み込む。
  * MenuPage（チケットの有無だけ確認したい）と
- * PickupTimePage（チケット画面を復元したい）の両方から使う。
+ * TicketPage（チケット画面を表示したい）の両方から使う。
  */
 export function readStoredTicket(): Ticket | null {
   try {
