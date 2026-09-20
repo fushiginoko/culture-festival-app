@@ -3,7 +3,7 @@ import MenuList from "../components/MenuList";
 import CartSummary from "../components/CartSummary";
 import type { MenuItemProps } from "../components/MenuItem";
 import { useNavigate, Navigate } from "react-router-dom";
-import { readStoredTicket } from "./ticketStorage";
+import { readStoredTicket } from "../lib/ticketStorage";
 
 // count と onChange を除いた「元データ」の型
 type MenuItemData = Omit<MenuItemProps, "count" | "onChange">;

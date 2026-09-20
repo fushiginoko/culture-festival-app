@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, Navigate } from "react-router-dom";
-import type { OrderItem, TimeSlot } from "./types";
-import { fetchTimeSlots, submitOrder } from "./pickupApi";
-import { saveTicket } from "./ticketStorage";
+import type { OrderItem, TimeSlot } from "../types";
+import { fetchTimeSlots, submitOrder } from "../lib/pickupApi";
+import { saveTicket } from "../lib/ticketStorage";
 import TimeSlotGrid from "../components/TimeSlotGrid";
 import OrderConfirmBar from "../components/OrderConfirmBar";
-import type { Ticket } from "./ticketStorage";
+import type { Ticket } from "../lib/ticketStorage";
 import "./PickupTimePage.css";
 
 type LocationState = { selectedItems: OrderItem[] } | undefined;

@@ -1,4 +1,4 @@
-import type { SlotStatus, TimeSlot } from "../pages/types";
+import type { SlotStatus, TimeSlot } from "../types";
 
 type TimeSlotGridProps = {
   slots: TimeSlot[];

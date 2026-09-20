@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import type { Ticket } from "./pages/ticketStorage";
-import { clearStoredTicket, readStoredTicket } from "./pages/ticketStorage";
-import "./pages/PickupTimePage.css";
+import type { Ticket } from "../lib/ticketStorage";
+import { clearStoredTicket, readStoredTicket } from "../lib/ticketStorage";
+import "./PickupTimePage.css";
 
 function TicketPage() {
   const navigate = useNavigate();

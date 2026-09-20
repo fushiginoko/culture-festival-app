@@ -1,4 +1,4 @@
-import type { OrderItem, SlotStatus, TimeSlot } from "./types";
+import type { OrderItem, SlotStatus, TimeSlot } from "../types";
 import { generateAuthCode } from "./crockfordBase32";
 
 // ▼ 営業時間・枠の設定（実際の文化祭のスケジュールに合わせて変更してください）

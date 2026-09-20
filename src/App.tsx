@@ -1,7 +1,7 @@
 import './App.css'
 import MenuPage from './pages/MenuPage'
 import PickupTimePage from './pages/PickupTimePage'
-import TicketPage from './TicketPage'
+import TicketPage from './pages/TicketPage'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 

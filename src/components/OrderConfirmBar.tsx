@@ -1,4 +1,4 @@
-import type { TimeSlot } from "../pages/types";
+import type { TimeSlot } from "../types";
 
 type OrderConfirmBarProps = {
   selectedSlot: TimeSlot | null;
