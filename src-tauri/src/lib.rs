@@ -1,8 +1,9 @@
 use rusqlite::Connection;
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
+use tauri::State;
 
-struct DBState {
+pub struct DBState {
     db: Mutex<Connection>,
 }
 
@@ -92,4 +93,21 @@ fn lookup_order(
     } else {
         Ok(None)
     }
+}
+
+#[tauri::command]
+fn complete_order(state: State<DBState>, auth_code: &str) -> Result<(), String> {
+    let conn = state.db.lock().map_err(|e| e.to_string())?;
+    let updated_rows = conn
+        .execute(
+            "UPDATE orders SET status = 'completed' WHERE auth_code = ?",
+            [auth_code],
+        )
+        .map_err(|e| e.to_string())?;
+
+    if updated_rows == 0 {
+        return Err("指定されたauth_codeの注文が見つかりませんでした".to_string());
+    }
+
+    Ok(())
 }
