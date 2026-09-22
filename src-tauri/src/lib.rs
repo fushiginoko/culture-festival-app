@@ -34,6 +34,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         .manage(DBState {
             db: Mutex::new(conn),
         })
+        .invoke_handler(tauri::generate_handler![lookup_order, complete_order])
         .setup(|app| {
             if cfg!(debug_assertions) {
                 app.handle().plugin(
