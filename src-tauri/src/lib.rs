@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
 use tauri::State;
 
-pub struct DBState {
+struct DBState {
     db: Mutex<Connection>,
 }
 
