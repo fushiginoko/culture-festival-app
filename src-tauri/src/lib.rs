@@ -67,6 +67,7 @@ pub struct Order {
     pub created_at: String,
 }
 
+#[tauri::command]
 fn lookup_order(
     state: &DBState,
     auth_code: &str,
