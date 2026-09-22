@@ -68,8 +68,7 @@ pub struct Order {
     pub created_at: String,
 }
 
-#[tauri::command]
-fn lookup_order(
+fn lookup_order_impl(
     state: &DBState,
     auth_code: &str,
 ) -> Result<Option<Order>, Box<dyn std::error::Error>> {
@@ -93,6 +92,11 @@ fn lookup_order(
     } else {
         Ok(None)
     }
+}
+
+#[tauri::command]
+fn lookup_order(state: State<DBState>, auth_code: &str) -> Result<Option<Order>, String> {
+    lookup_order_impl(&state, auth_code).map_err(|e| e.to_string())
 }
 
 #[tauri::command]
