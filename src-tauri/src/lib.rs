@@ -105,7 +105,7 @@ fn complete_order(state: State<DBState>, auth_code: &str) -> Result<(), String> 
     let conn = state.db.lock().map_err(|e| e.to_string())?;
     let updated_rows = conn
         .execute(
-            "UPDATE orders SET status = 'completed', updated_at = CURRENT_TIMESTAMP WHERE auth_code = ?",
+            "UPDATE orders SET status = 'completed', completed_at = CURRENT_TIMESTAMP WHERE auth_code = ?",
             [auth_code],
         )
         .map_err(|e| e.to_string())?;
