@@ -66,3 +66,29 @@ pub struct Order {
     pub status: String,
     pub created_at: String,
 }
+
+fn lookup_order(
+    state: &DBState,
+    auth_code: &str,
+) -> Result<Option<Order>, Box<dyn std::error::Error>> {
+    let conn = state.db.lock().map_err(|e| e.to_string())?;
+    let mut stmt = conn.prepare("SELECT id, auth_code, slot_id, items, total_price, status, created_at FROM orders WHERE auth_code = ?")?;
+    let mut rows = stmt.query([auth_code])?;
+    if let Some(row) = rows.next()? {
+        let items_json: String = row.get(3)?;
+        let items: Vec<OrderItem> = serde_json::from_str(&items_json)?;
+
+        let order: Order = Order {
+            id: row.get(0)?,
+            auth_code: row.get(1)?,
+            slot_id: row.get(2)?,
+            items,
+            total_price: row.get(4)?,
+            status: row.get(5)?,
+            created_at: row.get(6)?,
+        };
+        Ok(Some(order))
+    } else {
+        Ok(None)
+    }
+}
