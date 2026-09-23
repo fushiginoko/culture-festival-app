@@ -12,6 +12,8 @@ const STATUS_LABEL: Record<SlotStatus, string> = {
   some: "○",
   few: "△",
   full: "×",
+  closed: "締切",
+  past: "終了",
 };
 
 const STATUS_TEXT: Record<SlotStatus, string> = {
@@ -19,6 +21,8 @@ const STATUS_TEXT: Record<SlotStatus, string> = {
   some: "やや混雑",
   few: "残りわずか",
   full: "満枠",
+  closed: "受付終了",
+  past: "終了済み",
 };
 
 function TimeSlotGrid({
@@ -36,6 +40,8 @@ function TimeSlotGrid({
         <span>○ やや混雑</span>
         <span>△ 残りわずか</span>
         <span>× 満枠</span>
+        <span>締切 受付終了</span>
+        <span>終了 過去の枠</span>
       </div>
 
       {allFull && (
@@ -56,7 +62,12 @@ function TimeSlotGrid({
               className={`time-slot time-slot--${slot.status} ${
                 isSelected ? "time-slot--selected" : ""
               }`}
-              disabled={slot.status === "full" || disabled}
+              disabled={
+                slot.status === "full" ||
+                slot.status === "closed" ||
+                slot.status === "past" ||
+                disabled
+              }
               aria-pressed={isSelected}
               aria-label={`${slot.start}から${slot.end}、${STATUS_TEXT[slot.status]}`}
               onClick={() => onSelect(slot)}

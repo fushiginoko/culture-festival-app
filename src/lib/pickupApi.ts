@@ -53,6 +53,35 @@ function statusFromRatio(ratio: number): SlotStatus {
   return "many";
 }
 
+function slotTimeOnDate(time: string, date: Date): Date {
+  const [hours, minutes] = time.split(":").map(Number);
+  return new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+    hours,
+    minutes
+  );
+}
+
+function statusForSlot(
+  start: string,
+  end: string,
+  simulatedTime: Date,
+  capacityStatus: SlotStatus
+): SlotStatus {
+  const endTime = slotTimeOnDate(end, simulatedTime);
+  const startTime = slotTimeOnDate(start, simulatedTime);
+  const cutoffTime = new Date(
+    startTime.getTime() -
+      PICKUP_SLOT_DURATION_MINUTES * MINUTES_PER_HOUR * 1000
+  );
+
+  if (simulatedTime >= endTime) return "past";
+  if (simulatedTime >= cutoffTime) return "closed";
+  return capacityStatus;
+}
+
 function wait(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -64,7 +93,9 @@ function wait(ms: number) {
  * Firebase Realtime Database など）への問い合わせに置き換えてください。
  * 今はデモ用にランダムな空き状況を返しています。
  */
-export async function fetchTimeSlots(): Promise<TimeSlot[]> {
+export async function fetchTimeSlots(
+  simulatedTime: Date = new Date()
+): Promise<TimeSlot[]> {
   await wait(TIME_SLOTS_FETCH_DELAY_MS);
   return generateSlotLabels().map(({ start, end }) => {
     const reserved = Math.floor(
@@ -73,7 +104,12 @@ export async function fetchTimeSlots(): Promise<TimeSlot[]> {
     return {
       start,
       end,
-      status: statusFromRatio(reserved / PICKUP_SLOT_CAPACITY),
+      status: statusForSlot(
+        start,
+        end,
+        simulatedTime,
+        statusFromRatio(reserved / PICKUP_SLOT_CAPACITY)
+      ),
     };
   });
 }

@@ -11,8 +11,10 @@ export type OrderItem = {
  * ○ some : やや埋まってきている
  * △ few  : 残りわずか
  * × full : 満枠（選択不可）
+ * 受付終了 : 受付締切（選択不可）
+ * 過去 : 終了済み（選択不可）
  */
-export type SlotStatus = "many" | "some" | "few" | "full";
+export type SlotStatus = "many" | "some" | "few" | "full" | "closed" | "past";
 
 export type TimeSlot = {
   start: string; // 例: "10:15"

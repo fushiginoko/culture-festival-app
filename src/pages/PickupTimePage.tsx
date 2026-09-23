@@ -41,8 +41,32 @@ function PickupTimePage() {
         setView("error");
       });
 
+    // ページを開いたまま受付締切をまたいでも、選択可能な枠を更新する。
+    const refreshTimer = window.setInterval(() => {
+      fetchTimeSlots()
+        .then((data) => {
+          if (cancelled) return;
+          setSlots(data);
+          setSelectedSlot((selected) => {
+            if (!selected) return null;
+            const refreshed = data.find(
+              (slot) =>
+                slot.start === selected.start && slot.end === selected.end
+            );
+            return refreshed &&
+              refreshed.status !== "full" &&
+              refreshed.status !== "closed" &&
+              refreshed.status !== "past"
+              ? refreshed
+              : null;
+          });
+        })
+        .catch(() => {});
+    }, 60 * 1000);
+
     return () => {
       cancelled = true;
+      window.clearInterval(refreshTimer);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cartItems.length]);
@@ -52,23 +76,58 @@ function PickupTimePage() {
   }
 
   const handleSelectSlot = (slot: TimeSlot) => {
-    if (slot.status === "full" || view === "submitting") return;
+    if (
+      slot.status === "full" ||
+      slot.status === "closed" ||
+      slot.status === "past" ||
+      view === "submitting"
+    )
+      return;
     setSelectedSlot((prev) => (prev && prev.start === slot.start ? null : slot));
   };
 
   const handleConfirm = async () => {
-    if (!selectedSlot) return;
+    if (
+      !selectedSlot ||
+      selectedSlot.status === "full" ||
+      selectedSlot.status === "closed" ||
+      selectedSlot.status === "past"
+    )
+      return;
     setView("submitting");
     setErrorMessage("");
 
     try {
-      const result = await submitOrder(cartItems, selectedSlot);
+      // 確定直前に再取得し、画面表示後の締切・満枠を反映する。
+      const latestSlots = await fetchTimeSlots();
+      setSlots(latestSlots);
+      const latestSlot = latestSlots.find(
+        (slot) =>
+          slot.start === selectedSlot.start && slot.end === selectedSlot.end
+      );
+
+      if (
+        !latestSlot ||
+        latestSlot.status === "full" ||
+        latestSlot.status === "closed" ||
+        latestSlot.status === "past"
+      ) {
+        setSelectedSlot(null);
+        setErrorMessage(
+          "選んだ時間帯は受付終了または満枠になりました。別の時間を選んでください。"
+        );
+        setView("ready");
+        return;
+      }
+
+      setSelectedSlot(latestSlot);
+      const result = await submitOrder(cartItems, latestSlot);
 
       if (result.ok) {
         const newTicket: Ticket = {
           code: result.authCode,
           items: cartItems,
-          pickupTime: `${selectedSlot.start}〜${selectedSlot.end}`,
+          pickupTime: `${latestSlot.start}〜${latestSlot.end}`,
         };
         saveTicket(newTicket);
         navigate("/ticket", { replace: true });

@@ -15,6 +15,10 @@
   --status-few-ink: #85330a;
   --status-full-bg: #ede8e7;
   --status-full-ink: #7d7572;
+  --status-closed-bg: #e8e5df;
+  --status-closed-ink: #746d63;
+  --status-past-bg: #dedbd7;
+  --status-past-ink: #817a73;
 
   --font-display: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Rounded Mplus 1c",
     sans-serif;
@@ -125,6 +129,40 @@
   cursor: not-allowed;
   opacity: 0.45;
   box-shadow: none;
+}
+
+.time-slot--closed,
+.time-slot--past {
+  border-color: rgba(43, 38, 32, 0.08);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.time-slot--closed {
+  background: var(--status-closed-bg);
+  color: var(--status-closed-ink);
+  opacity: 0.65;
+}
+
+.time-slot--past {
+  background: var(--status-past-bg);
+  color: var(--status-past-ink);
+  opacity: 0.55;
+}
+
+/* 終了済みの枠は斜線を重ね、時刻が過去であることを明示する。 */
+.time-slot--past::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    transparent 47%,
+    rgba(43, 38, 32, 0.28) 48%,
+    rgba(43, 38, 32, 0.28) 52%,
+    transparent 53%
+  );
+  pointer-events: none;
 }
 
 .time-slot--selected {
