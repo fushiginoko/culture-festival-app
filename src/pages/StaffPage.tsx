@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
-import type { FormEvent } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import type { SubmitEvent } from 'react'
 import './StaffPage.css'
 import { completeOrder, getOrders, lookupOrder } from '../lib/staffApi'
 import type { Order } from '../lib/staffApi'
+import { useOrderSync } from '../hooks/useOrderSync'
 
 type StaffMode = 'pickup' | 'kitchen'
 const MODE_KEY = 'toot-staff-mode'
@@ -57,7 +58,7 @@ function PickupView() {
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
 
-  const lookup = async (event: FormEvent) => {
+  const lookup = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault()
     const normalized = code.trim().toUpperCase()
     if (!/^[0-9A-HJKMNP-TV-Z]{6}$/.test(normalized)) {
@@ -150,6 +151,28 @@ function KitchenView() {
     })
     return [...grouped.entries()]
   }, [orders])
+
+  // 注文が完了扱いになる・スロットが空になるなどでslotsから消えた
+  // slot:productId の組み合わせは、cookedのカウントも一緒に破棄する。
+  // （そうしないと、同じslot_idに後から似た構成の注文が来た際に古いカウントを引き継いでしまう）
+  useEffect(() => {
+    const validKeys = new Set<string>()
+    slots.forEach(([slot, items]) => {
+      items.forEach((_, productId) => validKeys.add(`${slot}:${productId}`))
+    })
+    setCooked((current) => {
+      let changed = false
+      const next: Record<string, number> = {}
+      for (const key of Object.keys(current)) {
+        if (validKeys.has(key)) {
+          next[key] = current[key]
+        } else {
+          changed = true
+        }
+      }
+      return changed ? next : current
+    })
+  }, [slots])
 
   const adjust = (key: string, amount: number) => setCooked((current) => ({ ...current, [key]: Math.max(0, (current[key] ?? 0) + amount) }))
   const [currentSlot, ...upcomingSlots] = slots
