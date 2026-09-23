@@ -34,7 +34,11 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         .manage(DBState {
             db: Mutex::new(conn),
         })
-        .invoke_handler(tauri::generate_handler![lookup_order, complete_order])
+        .invoke_handler(tauri::generate_handler![
+            lookup_order,
+            complete_order,
+            get_orders
+        ])
         .setup(|app| {
             if cfg!(debug_assertions) {
                 app.handle().plugin(
@@ -98,6 +102,32 @@ fn lookup_order_impl(
 #[tauri::command]
 fn lookup_order(state: State<DBState>, auth_code: &str) -> Result<Option<Order>, String> {
     lookup_order_impl(&state, auth_code).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn get_orders(state: State<DBState>) -> Result<Vec<Order>, String> {
+    let conn = state.db.lock().map_err(|e| e.to_string())?;
+    let mut stmt = conn
+        .prepare("SELECT id, auth_code, slot_id, items, total_price, status, created_at FROM orders ORDER BY slot_id, created_at")
+        .map_err(|e| e.to_string())?;
+    let rows = stmt
+        .query_map([], |row| {
+            let items_json: String = row.get(3)?;
+            let items: Vec<OrderItem> = serde_json::from_str(&items_json)
+                .map_err(|error| rusqlite::Error::ToSqlConversionFailure(Box::new(error)))?;
+            Ok(Order {
+                id: row.get(0)?,
+                auth_code: row.get(1)?,
+                slot_id: row.get(2)?,
+                items,
+                total_price: row.get(4)?,
+                status: row.get(5)?,
+                created_at: row.get(6)?,
+            })
+        })
+        .map_err(|e| e.to_string())?;
+    rows.collect::<Result<Vec<_>, _>>()
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
