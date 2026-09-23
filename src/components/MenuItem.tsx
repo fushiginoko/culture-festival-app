@@ -25,20 +25,20 @@ function MenuItem({ name, price, count, onChange }: MenuItemProps) {
       <div className="stepper">
         <button
           type="button"
-          onClick={handleDecrement}
-          disabled={count === 0}
-          aria-label={`${name}を1個減らす`}
-        >
-          −
-        </button>
-        <span className="count-display">{count}</span>
-        <button
-          type="button"
           onClick={handleIncrement}
           disabled={count >= MAX_ITEM_QUANTITY}
           aria-label={`${name}を1個増やす`}
         >
           ＋
+        </button>
+        <span className="count-display">{count}</span>
+        <button
+          type="button"
+          onClick={handleDecrement}
+          disabled={count === 0}
+          aria-label={`${name}を1個減らす`}
+        >
+          −
         </button>
       </div>
     </article>
