@@ -83,6 +83,9 @@ function statusForSlot(
 export async function fetchTimeSlots(
   simulatedTime: Date = new Date()
 ): Promise<TimeSlot[]> {
+
+  simulatedTime.setHours(10, 30, 0, 0);
+
   try {
     // Supabaseから現在有効な注文の slot_id を取得
     const { data: orders, error } = await supabase

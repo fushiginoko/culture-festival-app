@@ -50,7 +50,8 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         .invoke_handler(tauri::generate_handler![
             lookup_order,
             complete_order,
-            get_orders
+            get_orders,
+            sync_orders
         ])
         .setup(|app| {
             if cfg!(debug_assertions) {
@@ -158,4 +159,61 @@ fn complete_order(state: State<DBState>, auth_code: &str) -> Result<(), String> 
     }
 
     Ok(())
+}
+
+#[tauri::command]
+fn sync_orders(state: State<DBState>, orders: Vec<Order>) -> Result<usize, String> {
+    let mut conn = state.db.lock().map_err(|e| e.to_string())?;
+
+    // トランザクションを使って爆速かつ安全に一括挿入/更新
+    let tx = conn.transaction().map_err(|e| e.to_string())?;
+    let mut synced_count = 0;
+
+    {
+        // 既存のidがあれば内容を上書き更新するupsert。
+        // これによりSupabase側のUPDATEイベント（statusの変更など）もSQLiteへ反映される。
+        // 注意: completed_at はこのコマンドの対象外（complete_orderコマンドが個別に更新する）ため、
+        //       ここでのupdateではcompleted_atは変更されない。
+        let mut stmt = tx
+            .prepare(
+                "INSERT INTO orders (id, auth_code, slot_id, items, total_price, status, created_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?)
+                 ON CONFLICT(id) DO UPDATE SET
+                    auth_code = excluded.auth_code,
+                    slot_id = excluded.slot_id,
+                    items = excluded.items,
+                    total_price = excluded.total_price,
+                    status = excluded.status,
+                    created_at = excluded.created_at"
+            )
+            .map_err(|e| e.to_string())?;
+
+        for order in orders {
+            let items_json = serde_json::to_string(&order.items).map_err(|e| e.to_string())?;
+            let affected = stmt
+                .execute(rusqlite::params![
+                    order.id,
+                    order.auth_code,
+                    order.slot_id,
+                    items_json,
+                    order.total_price,
+                    order.status,
+                    order.created_at
+                ])
+                .map_err(|e| e.to_string())?;
+
+            synced_count += affected;
+        }
+    }
+
+    tx.commit().map_err(|e| e.to_string())?;
+
+    if synced_count > 0 {
+        log::info!(
+            "SQLiteに {} 件の注文を同期しました（新規/更新）",
+            synced_count
+        );
+    }
+
+    Ok(synced_count)
 }
