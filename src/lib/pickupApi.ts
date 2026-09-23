@@ -1,9 +1,6 @@
 import type { OrderItem, SlotStatus, TimeSlot } from "../types";
-import { generateAuthCode } from "./crockfordBase32";
+import { supabase } from "./supabase";
 import {
-  AUTH_CODE_LENGTH,
-  DEMO_RESERVED_CAPACITY_BUFFER,
-  DEMO_SLOT_FULL_PROBABILITY,
   MINUTES_PER_HOUR,
   PICKUP_CLOSE_HOUR,
   PICKUP_CLOSE_MINUTE,
@@ -11,12 +8,10 @@ import {
   PICKUP_OPEN_MINUTE,
   PICKUP_SLOT_CAPACITY,
   PICKUP_SLOT_DURATION_MINUTES,
-  ORDER_SUBMIT_DELAY_MS,
   SLOT_STATUS_FULL_THRESHOLD,
   SLOT_STATUS_FEW_THRESHOLD,
   SLOT_STATUS_SOME_THRESHOLD,
   TIME_LABEL_DIGITS,
-  TIME_SLOTS_FETCH_DELAY_MS,
 } from "./constants";
 
 function pad(n: number): string {
@@ -82,36 +77,56 @@ function statusForSlot(
   return capacityStatus;
 }
 
-function wait(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 /**
- * 各時間帯の空き状況を取得する。
- *
- * TODO: ここをスタッフ側と同期しているサーバー（例: 独自REST API や
- * Firebase Realtime Database など）への問い合わせに置き換えてください。
- * 今はデモ用にランダムな空き状況を返しています。
+ * Supabaseから実際の注文数を取得し、各時間帯の混雑状況を計算して返す
  */
 export async function fetchTimeSlots(
   simulatedTime: Date = new Date()
 ): Promise<TimeSlot[]> {
-  await wait(TIME_SLOTS_FETCH_DELAY_MS);
-  return generateSlotLabels().map(({ start, end }) => {
-    const reserved = Math.floor(
-      Math.random() * (PICKUP_SLOT_CAPACITY + DEMO_RESERVED_CAPACITY_BUFFER)
-    );
-    return {
-      start,
-      end,
-      status: statusForSlot(
+  try {
+    // Supabaseから現在有効な注文の slot_id を取得
+    const { data: orders, error } = await supabase
+      .from("orders")
+      .select("slot_id")
+      .neq("status", "cancelled");
+
+    if (error) {
+      console.error("注文状況の取得に失敗しました:", error.message);
+      throw error;
+    }
+
+    // スロットごとの予約数をカウント
+    const counts: Record<string, number> = {};
+    for (const order of orders || []) {
+      counts[order.slot_id] = (counts[order.slot_id] || 0) + 1;
+    }
+
+    // 枠一覧に対して実際の混雑度をマッピング
+    return generateSlotLabels().map(({ start, end }) => {
+      const slotId = `${start}-${end}`;
+      const reserved = counts[slotId] || 0;
+      const ratio = reserved / PICKUP_SLOT_CAPACITY;
+
+      return {
         start,
         end,
-        simulatedTime,
-        statusFromRatio(reserved / PICKUP_SLOT_CAPACITY)
-      ),
-    };
-  });
+        status: statusForSlot(
+          start,
+          end,
+          simulatedTime,
+          statusFromRatio(ratio)
+        ),
+      };
+    });
+  } catch (e) {
+    console.error("fetchTimeSlots failed:", e);
+    // 万が一ネットが繋がらない時は全枠closed等にフォールバック
+    return generateSlotLabels().map(({ start, end }) => ({
+      start,
+      end,
+      status: "closed",
+    }));
+  }
 }
 
 export type SubmitOrderResult =
@@ -119,28 +134,60 @@ export type SubmitOrderResult =
   | { ok: false; reason: "slot_full" | "network_error" };
 
 /**
- * 注文を送信し、スタッフ側のシステムに受け付けられたことを確認してから
- * 認証コードを受け取る。
- *
- * TODO: ここを実際のサーバーへの送信処理に置き換えてください。
- * サーバー側で「その時間帯がまだ埋まっていないか」を再チェックし、
- * 受付が確定した場合にのみ authCode を発行してレスポンスとして
- * 返すようにすると、二重予約や表示上の空き枠とのズレを防げます。
- * （認証コードはここで生成していますが、本番ではスタッフ側との
- * 照合のためサーバー側で発行するのが望ましいです）
+ * 注文をSupabaseに送信し、確定したらBase32認証コードを返す
  */
 export async function submitOrder(
   items: OrderItem[],
   slot: Pick<TimeSlot, "start" | "end">
 ): Promise<SubmitOrderResult> {
-  await wait(ORDER_SUBMIT_DELAY_MS);
-  void items; // 実装時はここでリクエストボディに含める
-  void slot; // 実装時はここでリクエストボディに含める
+  const slotId = `${slot.start}-${slot.end}`;
 
-  // デモ用: まれに「ちょうど満枠になってしまった」ケースを再現
-  if (Math.random() < DEMO_SLOT_FULL_PROBABILITY) {
-    return { ok: false, reason: "slot_full" };
+  try {
+    // 1. 念のため現在の枠の埋まり具合をチェック
+    const { count, error: countError } = await supabase
+      .from("orders")
+      .select("*", { count: "exact", head: true })
+      .eq("slot_id", slotId)
+      .neq("status", "cancelled");
+
+    if (countError) throw countError;
+
+    if (count !== null && count >= PICKUP_SLOT_CAPACITY) {
+      return { ok: false, reason: "slot_full" };
+    }
+
+    // 3. 合計金額の計算
+    const totalPrice = items.reduce(
+      (sum, item) => sum + item.price * item.count,
+      0
+    );
+
+    // （Rust側が受け取れるように product_id と quantity に整形して送信）
+    const formattedItems = items.map((item) => ({
+      product_id: item.id,
+      name: item.name,
+      price: item.price,
+      quantity: item.count,
+    }));
+
+    // 4. Supabaseの orders テーブルへ INSERT！
+    const result = await supabase.from("orders").insert({
+      slot_id: slotId,
+      items: formattedItems,
+      total_price: totalPrice,
+      status: "pending",
+    }).select("auth_code").single();
+
+    if (result.error) {
+      console.error("Supabase insert error:", result.error.message);
+      return { ok: false, reason: "network_error" };
+    }
+
+    const authCode = (result.data as { auth_code: string }).auth_code;
+    console.log(`🎉 注文確定！ [AuthCode: ${authCode}, Slot: ${slotId}]`);
+    return { ok: true, authCode };
+  } catch (error) {
+    console.error("submitOrder failed:", error);
+    return { ok: false, reason: "network_error" };
   }
-
-  return { ok: true, authCode: generateAuthCode(AUTH_CODE_LENGTH) };
 }
