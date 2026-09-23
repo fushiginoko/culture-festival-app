@@ -10,13 +10,24 @@ function CartSummary({ items, onSelectTime }: CartSummaryProps) {
   const totalCount = items.reduce((acc, item) => acc + item.count, 0);
 
   return (
-    <div>
-      <p>合計: {total}円</p>
+    <div className="cart-summary">
+      <div className="cart-summary__inner">
+        <div className="cart-summary__totals" aria-live="polite">
+          <span className="cart-summary__count">{totalCount}点</span>
+          <strong className="cart-summary__total">
+            合計 ¥{total.toLocaleString("ja-JP")}
+          </strong>
+        </div>
 
-      {/* 1個以上注文を受けていないと押せないボタン */}
-      <button onClick={onSelectTime} disabled={totalCount === 0}>
-        {totalCount === 0 ? "商品を選択してください" : "受取時間を選ぶ"}
-      </button>
+        <button
+          type="button"
+          className="cart-summary__button"
+          onClick={onSelectTime}
+          disabled={totalCount === 0}
+        >
+          受取時間を選ぶ →
+        </button>
+      </div>
     </div>
   );
 }

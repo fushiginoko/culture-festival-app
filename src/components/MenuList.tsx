@@ -1,10 +1,9 @@
-import MenuItem from "./MenuItem"
-import type { MenuItemProps } from "./MenuItem"
-
+import MenuItem from "./MenuItem";
+import type { MenuItemProps } from "./MenuItem";
 
 function MenuList(props: { items: MenuItemProps[] }) {
   return (
-    <div>
+    <section className="menu-list" aria-label="商品一覧">
       {props.items.map((item) => (
         <MenuItem
           key={item.id}
@@ -15,7 +14,8 @@ function MenuList(props: { items: MenuItemProps[] }) {
           onChange={item.onChange}
         />
       ))}
-    </div>
-  )
+    </section>
+  );
 }
-export default MenuList
+
+export default MenuList;

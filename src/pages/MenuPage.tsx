@@ -4,6 +4,7 @@ import CartSummary from "../components/CartSummary";
 import type { MenuItemProps } from "../components/MenuItem";
 import { useNavigate, Navigate } from "react-router-dom";
 import { readStoredTicket } from "../lib/ticketStorage";
+import "./MenuPage.css";
 
 // count と onChange を除いた「元データ」の型
 type MenuItemData = Omit<MenuItemProps, "count" | "onChange">;
@@ -17,6 +18,7 @@ const MENU_DATA: MenuItemData[] = [
 
 function MenuPage() {
   const navigate = useNavigate();
+  const [hasStoredTicket] = useState(() => Boolean(readStoredTicket()));
 
   // idごとのcountをオブジェクトで一括管理
   const [counts, setCounts] = useState<Record<number, number>>(
@@ -43,16 +45,28 @@ function MenuPage() {
     navigate("/pickup-time", { state: { selectedItems } });
   };
 
-  // すでに確定済みのチケットがある場合は、メニューを選ばせず
-  // すでに確定済みのチケットがある場合は、チケット画面へ直接飛ばす。
+  // 保存済みのチケットがある場合は、メニューを選ばせずチケット画面へ戻す。
   // 新しい注文はチケット画面の「新しく注文する」ボタンから始めてもらう。
-  if (readStoredTicket()) {
+  if (hasStoredTicket) {
     return <Navigate to="/ticket" replace />;
   }
 
   return (
-    <div>
-      <MenuList items={menuItems} />
+    <div className="menu-page">
+      <main className="menu-page__content">
+        <header className="menu-header">
+          <div className="menu-header__logo-frame" role="img" aria-label="TOOT ロゴ">
+            {/* 将来ここをSVGロゴに差し替える。 */}
+            <span aria-hidden="true">TOOT</span>
+          </div>
+          <div className="menu-header__copy">
+            <h1 className="menu-header__logo">TOOT</h1>
+            <p className="menu-header__subtitle">三年生の出店・出来立て予約</p>
+          </div>
+        </header>
+
+        <MenuList items={menuItems} />
+      </main>
       <CartSummary items={menuItems} onSelectTime={handleSelectTime} />
     </div>
   );

@@ -17,25 +17,31 @@ function MenuItem({ name, price, count, onChange }: MenuItemProps) {
   };
 
   return (
-    <div className="menu-item">
-      <div>
-        <h2>{name}</h2>
-        <p>{price}円</p>
+    <article className="menu-item">
+      <div className="menu-item__details">
+        <h2 className="menu-item__name">{name}</h2>
+        <p className="menu-item__price">¥{price.toLocaleString("ja-JP")}</p>
       </div>
       <div className="stepper">
-        <button onClick={handleDecrement} disabled={count === 0} aria-label="減らす">
+        <button
+          type="button"
+          onClick={handleDecrement}
+          disabled={count === 0}
+          aria-label={`${name}を1個減らす`}
+        >
           −
         </button>
         <span className="count-display">{count}</span>
         <button
+          type="button"
           onClick={handleIncrement}
           disabled={count >= MAX_ITEM_QUANTITY}
-          aria-label="増やす"
+          aria-label={`${name}を1個増やす`}
         >
           ＋
         </button>
       </div>
-    </div>
+    </article>
   );
 }
 
