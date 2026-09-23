@@ -132,6 +132,12 @@ function KitchenView() {
   }
   useEffect(() => { void refresh() }, [])
 
+  // Supabase → SQLite の同期（新規注文・注文更新・初回同期完了）を検知したら
+  // ローカルSQLiteから最新状態を読み直して画面に反映する
+  const refreshRef = useRef(refresh)
+  useEffect(() => { refreshRef.current = refresh })
+  useOrderSync(() => { void refreshRef.current() })
+
   const slots = useMemo(() => {
     const grouped = new Map<string, Map<number, { item: Order['items'][number]; quantity: number }>>()
     orders.filter((order) => order.status !== 'completed').forEach((order) => {
