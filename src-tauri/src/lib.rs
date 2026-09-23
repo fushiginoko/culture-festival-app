@@ -29,6 +29,19 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         "CREATE INDEX IF NOT EXISTS idx_orders_auth_code ON  orders(auth_code)",
         [],
     )?;
+    if cfg!(debug_assertions) {
+        // テスト用データの挿入関数
+        let count: i64 = conn.query_row("SELECT COUNT(*) FROM orders", [], |r| r.get(0))?;
+        if count == 0 {
+            conn.execute(
+                "INSERT INTO orders (id, auth_code, slot_id, items, total_price, status, created_at) VALUES
+                ('1', 'A2T61W', '12:15', '[{\"product_id\":1,\"name\":\"ハンバーガー\",\"quantity\":5,\"price\":300},{\"product_id\":2,\"name\":\"フライドチキン\",\"quantity\":3,\"price\":400}]', 2700, 'pending', datetime('now')),
+                ('2', 'K946RE', '12:30', '[{\"product_id\":1,\"name\":\"ハンバーガー\",\"quantity\":2,\"price\":300},{\"product_id\":3,\"name\":\"ピザ\",\"quantity\":1,\"price\":500}]', 1100, 'pending', datetime('now')),
+                ('3', 'B9DD9J', '12:45', '[{\"product_id\":2,\"name\":\"フライドチキン\",\"quantity\":4,\"price\":400}]', 1600, 'pending', datetime('now'))",
+                [],
+            )?;
+        }
+    }
 
     tauri::Builder::default()
         .manage(DBState {
