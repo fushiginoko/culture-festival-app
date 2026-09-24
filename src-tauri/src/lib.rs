@@ -35,9 +35,9 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         if count == 0 {
             conn.execute(
                 "INSERT INTO orders (id, auth_code, slot_id, items, total_price, status, created_at) VALUES
-                ('1', 'A2T61W', '12:15', '[{\"product_id\":1,\"name\":\"ハンバーガー\",\"quantity\":5,\"price\":300},{\"product_id\":2,\"name\":\"フライドチキン\",\"quantity\":3,\"price\":400}]', 2700, 'pending', datetime('now')),
-                ('2', 'K946RE', '12:30', '[{\"product_id\":1,\"name\":\"ハンバーガー\",\"quantity\":2,\"price\":300},{\"product_id\":3,\"name\":\"ピザ\",\"quantity\":1,\"price\":500}]', 1100, 'pending', datetime('now')),
-                ('3', 'B9DD9J', '12:45', '[{\"product_id\":2,\"name\":\"フライドチキン\",\"quantity\":4,\"price\":400}]', 1600, 'pending', datetime('now'))",
+                ('1', 'A2T61W', '12:15-12:30', '[{\"product_id\":1,\"name\":\"ハンバーガー\",\"quantity\":5,\"price\":300},{\"product_id\":2,\"name\":\"フライドチキン\",\"quantity\":3,\"price\":400}]', 2700, 'pending', datetime('now')),
+                ('2', 'K946RE', '12:30-12:45', '[{\"product_id\":1,\"name\":\"ハンバーガー\",\"quantity\":2,\"price\":300},{\"product_id\":3,\"name\":\"ピザ\",\"quantity\":1,\"price\":500}]', 1100, 'pending', datetime('now')),
+                ('3', 'B9DD9J', '12:45-13:00', '[{\"product_id\":2,\"name\":\"フライドチキン\",\"quantity\":4,\"price\":400}]', 1600, 'pending', datetime('now'))",
                 [],
             )?;
         }
@@ -175,18 +175,21 @@ fn sync_orders(state: State<DBState>, orders: Vec<Order>) -> Result<usize, Strin
         // 注意: completed_at はこのコマンドの対象外（complete_orderコマンドが個別に更新する）ため、
         //       ここでのupdateではcompleted_atは変更されない。
         let mut stmt = tx
-            .prepare(
-                "INSERT INTO orders (id, auth_code, slot_id, items, total_price, status, created_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?)
-                 ON CONFLICT(id) DO UPDATE SET
-                    auth_code = excluded.auth_code,
-                    slot_id = excluded.slot_id,
-                    items = excluded.items,
-                    total_price = excluded.total_price,
-                    status = excluded.status,
-                    created_at = excluded.created_at"
-            )
-            .map_err(|e| e.to_string())?;
+                    .prepare(
+                        "INSERT INTO orders (id, auth_code, slot_id, items, total_price, status, created_at)
+                         VALUES (?, ?, ?, ?, ?, ?, ?)
+                         ON CONFLICT(id) DO UPDATE SET
+                            auth_code = excluded.auth_code,
+                            slot_id = excluded.slot_id,
+                            items = excluded.items,
+                            total_price = excluded.total_price,
+                            status = CASE
+                                WHEN orders.status = 'completed' THEN 'completed'
+                                ELSE excluded.status
+                            END,
+                            created_at = excluded.created_at"
+                    )
+                    .map_err(|e| e.to_string())?;
 
         for order in orders {
             let items_json = serde_json::to_string(&order.items).map_err(|e| e.to_string())?;
