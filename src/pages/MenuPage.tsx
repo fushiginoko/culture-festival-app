@@ -5,7 +5,7 @@ import type { MenuItemProps } from "../components/MenuItem";
 import { useNavigate, Navigate } from "react-router-dom";
 import { readStoredTicket } from "../lib/ticketStorage";
 import "./MenuPage.css";
-import tootLogo from "../assets/TOOT_logo_76.webp";
+import tootLogo from "../assets/TOOT_logo.svg";
 
 // count と onChange を除いた「元データ」の型
 type MenuItemData = Omit<MenuItemProps, "count" | "onChange">;
@@ -56,8 +56,8 @@ function MenuPage() {
     <div className="menu-page">
       <main className="menu-page__content">
         <header className="menu-header">
-          <div className="menu-header__logo-frame" role="img" aria-label="TOOT ロゴ">
-            <img src={tootLogo} alt="TOOT ロゴ" className="menu-header__logo" />
+          <div className="menu-header__logo-frame">
+            <img src={tootLogo} alt="" className="menu-header__logo" />
           </div>
           <div className="menu-header__copy">
             <h1 className="menu-header__logo">TOOT</h1>
