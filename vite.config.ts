@@ -12,14 +12,13 @@ export default defineConfig({
     react(),
     babel({ presets: [reactCompilerPreset()] })
   ],
-  // TauriのWebViewでアセット（JS/CSS）を相対パスで確実に読み込ませる設定
   base: './',
   build: {
     rollupOptions: {
       input: {
         // 客側Webアプリ
         main: resolve(__dirname, 'index.html'),
-        // 🚀 スタッフ用デスクトップアプリ（これでdistに出力される！）
+        // スタッフ用デスクトップアプリ
         staff: resolve(__dirname, 'staff.html'),
       },
     },
