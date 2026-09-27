@@ -5,6 +5,7 @@ import { fetchTimeSlots, submitOrder } from "../lib/pickupApi";
 import { saveTicket } from "../lib/ticketStorage";
 import TimeSlotGrid from "../components/TimeSlotGrid";
 import OrderConfirmBar from "../components/OrderConfirmBar";
+import OrderHeader from "../components/OrderHeader";
 import type { Ticket } from "../lib/ticketStorage";
 import "./PickupTimePage.css";
 
@@ -154,30 +155,71 @@ function PickupTimePage() {
 
   return (
     <div className="pickup-page">
-      <h1>受け取り時間を選んでください</h1>
-
-      {view === "loading" && <p>読み込み中…</p>}
-
-      {view === "error" && (
-        <div className="error-banner">
-          <p>{errorMessage}</p>
-          <button type="button" onClick={() => window.location.reload()}>
-            再読み込み
-          </button>
+      <OrderHeader currentStep={2} />
+      <header className="pickup-page__header">
+        <div>
+          <p className="pickup-eyebrow">受け取りの準備</p>
+          <h1>受け取り時間を選ぶ</h1>
+          <p className="pickup-page__intro">都合のよい時間をひとつ選んでください。</p>
         </div>
-      )}
+        <p className="pickup-page__step-note"><strong>15分ごと</strong>の受け取り枠から選べます</p>
+      </header>
 
-      {(view === "ready" || view === "submitting") && (
-        <>
-          {errorMessage && <p className="error-banner">{errorMessage}</p>}
-          <TimeSlotGrid
-            slots={slots}
-            selectedSlot={selectedSlot}
-            disabled={view === "submitting"}
-            onSelect={handleSelectSlot}
-          />
-        </>
-      )}
+      <main className="pickup-page__content">
+        {view === "loading" && (
+          <div className="loading-state" role="status" aria-live="polite">
+            <span className="loading-state__mark" aria-hidden="true" />
+            <p>受け取り枠を確認しています</p>
+          </div>
+        )}
+
+        {view === "error" && (
+          <div className="error-state" role="alert">
+            <span className="error-state__mark" aria-hidden="true">!</span>
+            <div>
+              <p>{errorMessage}</p>
+              <button type="button" onClick={() => window.location.reload()}>
+                空き状況を読み込み直す
+              </button>
+            </div>
+          </div>
+        )}
+
+        {(view === "ready" || view === "submitting") && (
+          <div className="pickup-layout">
+            <section className="pickup-schedule" aria-label="受け取り可能な時間">
+              <header className="pickup-schedule__header">
+                <div>
+                  <p className="pickup-eyebrow">AVAILABLE TIMES</p>
+                  <h2>受け取り枠</h2>
+                </div>
+                <p>空き状況を見て、枠をお選びください。</p>
+              </header>
+              {errorMessage && <p className="error-banner" role="alert">{errorMessage}</p>}
+              <TimeSlotGrid
+                slots={slots}
+                selectedSlot={selectedSlot}
+                disabled={view === "submitting"}
+                onSelect={handleSelectSlot}
+              />
+            </section>
+
+            <aside className="order-glance">
+              <p className="pickup-eyebrow">YOUR ORDER</p>
+              <h2>今回のご注文</h2>
+              <ul>
+                {cartItems.map((item) => (
+                  <li key={item.id}>
+                    <span>{item.name}</span>
+                    <strong>{item.count}点</strong>
+                  </li>
+                ))}
+              </ul>
+              <p className="order-glance__note">選んだ時間にあわせてご用意します。受け取り時は、完了画面のコードをスタッフにお見せください。</p>
+            </aside>
+          </div>
+        )}
+      </main>
 
       <OrderConfirmBar
         selectedSlot={selectedSlot}

@@ -25,7 +25,7 @@ function CartSummary({ items, onSelectTime }: CartSummaryProps) {
           onClick={onSelectTime}
           disabled={totalCount === 0}
         >
-          時間を指定する
+          受け取り時間を選ぶ
         </button>
       </div>
     </div>

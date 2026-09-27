@@ -1,0 +1,80 @@
+.order-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.order-steps li {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex: 1 1 0;
+  align-items: center;
+  gap: 9px;
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.order-steps li:not(:last-child)::after {
+  width: clamp(12px, 2vw, 28px);
+  height: 1px;
+  flex: 0 0 auto;
+  margin: 0 clamp(7px, 1.2vw, 16px);
+  background: var(--line-strong);
+  content: "";
+}
+
+.order-steps__number {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.order-steps__complete .order-steps__number {
+  border-color: var(--state-positive-bg);
+  background: var(--state-positive-bg);
+  color: var(--state-positive-ink);
+}
+
+.order-steps li.order-steps__current {
+  color: var(--ink);
+}
+
+.order-steps__current .order-steps__number {
+  border-color: var(--brand-accent);
+  background: var(--brand-accent);
+  color: var(--ink);
+}
+
+@media (max-width: 700px) {
+  .order-steps li {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 10px;
+  }
+
+  .order-steps li:not(:last-child)::after {
+    position: absolute;
+    top: 15px;
+    right: 8px;
+    left: 38px;
+    width: auto;
+    margin: 0;
+  }
+}

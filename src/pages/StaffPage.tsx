@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { SubmitEvent } from 'react'
 import './StaffPage.css'
+import tootLogo from '../assets/TOOT_logo.svg'
 import { completeOrder, getOrders, lookupOrder } from '../lib/staffApi'
 import type { Order } from '../lib/staffApi'
 import { useOrderSync } from '../hooks/useOrderSync'
@@ -30,9 +31,12 @@ export default function StaffPage() {
   return (
     <main className="staff-page">
       <header className="staff-header">
-        <div>
-          <p className="eyebrow">TOOT / STAFF DESK</p>
-          <h1>{mode === 'pickup' ? '受取窓口' : '厨房キュー'}</h1>
+        <div className="staff-brand">
+          <img src={tootLogo} alt="" className="staff-brand__logo" />
+          <div>
+            <p className="eyebrow">TOOT / FESTIVAL SERVICE</p>
+            <h1>{mode === 'pickup' ? '受取窓口' : '厨房キュー'}</h1>
+          </div>
         </div>
         <div className="settings">
           <button className="icon-button" onClick={() => setSettingsOpen(!settingsOpen)} aria-label="設定" aria-expanded={settingsOpen}>
@@ -96,13 +100,13 @@ function PickupView() {
   }
 
   return (
-    <section className="pickup-view">
+    <section className={`pickup-view ${order ? 'pickup-view--matched' : ''}`}>
       <div className="lookup-panel">
-        <h2>認証コードを照合</h2>
+        <h2>お客様のコードを照合</h2>
         <p className="muted">お客様から伝えられた6桁のコードを入力してください</p>
         <form onSubmit={lookup} className="lookup-form">
           <input value={code} onChange={(event) => setCode(event.target.value.toUpperCase())} inputMode="text" maxLength={6} autoComplete="off" autoCorrect="off" spellCheck={false} placeholder="例: 4K7M2P" aria-label="認証コード" />
-          <button className="primary-button" type="submit" disabled={busy}>{busy ? '照合中…' : '照合する'}</button>
+          <button className="primary-button" type="submit" disabled={busy}>{busy ? '照合しています…' : '注文を探す'}</button>
         </form>
         {message && <p className="status-message" role="status">{message}</p>}
       </div>
@@ -111,7 +115,7 @@ function PickupView() {
           <div className="order-card-title"><span>注文内容</span><span className="order-status">{order.status}</span></div>
           <ul className="order-items">{order.items.map((item) => <li key={item.product_id}><span>{item.name}</span><strong>× {item.quantity}</strong></li>)}</ul>
           <div className="order-meta"><span>受取枠 <strong>{order.slot_id}</strong></span><span>合計 <strong>{formatYen(order.total_price)}</strong></span></div>
-          <button className="complete-button" onClick={complete} disabled={busy}>受取済みにする</button>
+          <button className="complete-button" onClick={complete} disabled={busy}>受け渡しを完了する</button>
         </div>
       )}
     </section>
@@ -193,9 +197,9 @@ function KitchenView() {
 
   return (
     <section className="kitchen-view">
-      <div className="kitchen-toolbar"><p className="muted">未完了の注文を受取枠ごとに集計しています</p><button className="secondary-button" onClick={() => void refresh()}>↻ 更新</button></div>
+      <div className="kitchen-toolbar"><p className="muted">未完了の注文を受取枠ごとに集計しています</p><button className="secondary-button" onClick={() => void refresh()}>注文一覧を読み込み直す</button></div>
       {message && <p className="status-message">{message}</p>}
-      {slots.length === 0 && <div className="empty-state">現在、作るものはありません</div>}
+      {slots.length === 0 && <div className="empty-state">新しい注文をお待ちしています</div>}
       {currentSlot && <div className="kitchen-columns">
         <article className="slot-card slot-card--current">
           <div className="slot-heading"><span className="slot-kicker">いま作る枠</span><h2>{currentSlot[0]}</h2></div>
