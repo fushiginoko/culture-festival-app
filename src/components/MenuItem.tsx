@@ -13,7 +13,7 @@ function MenuItem({ name, price, count, maxQuantity, onChange }: MenuItemProps) 
     if (count > 0) onChange(count - 1);
   };
   const handleIncrement = () => {
-    if (count < MAX_ITEM_QUANTITY) onChange(count + 1);
+    if (count < Math.min(maxQuantity, MAX_ITEM_QUANTITY)) onChange(count + 1);
   };
 
   const isSoldOut = maxQuantity <= 0;
@@ -31,7 +31,7 @@ function MenuItem({ name, price, count, maxQuantity, onChange }: MenuItemProps) 
         <button
           type="button"
           onClick={handleIncrement}
-          disabled={count >= MAX_ITEM_QUANTITY}
+          disabled={count >= Math.min(maxQuantity, MAX_ITEM_QUANTITY)}
           aria-label={`${name}を1個増やす`}
         >
           ＋
