@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MenuList from "../components/MenuList";
 import CartSummary from "../components/CartSummary";
 import type { MenuItemProps } from "../components/MenuItem";
@@ -25,6 +25,27 @@ function MenuPage() {
   const [counts, setCounts] = useState<Record<number, number>>(
     Object.fromEntries(MENU_DATA.map((item) => [item.id, 0]))
   );
+
+  // 商品ごとの「これまでの注文済み数量」。取得できるまでは0として扱う。
+  const [orderedQuantities, setOrderedQuantities] = useState<Record<number, number>>({});
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadStock() {
+      try {
+        const totals = await fetchOrderedQuantities();
+        if (isMounted) setOrderedQuantities(totals);
+      } catch (error) {
+        console.error("在庫数の取得に失敗しました", error);
+      }
+    }
+
+    loadStock();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleChange = (id: number, newCount: number) => {
     setCounts((prev) => ({ ...prev, [id]: newCount }));

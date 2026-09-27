@@ -127,6 +127,12 @@
   line-height: 1.2;
 }
 
+.menu-item__stock {
+  margin-top: 4px;
+  color: var(--color-ink-soft);
+  font-size: 12px;
+}
+
 .stepper {
   display: inline-flex;
   width: 42px;

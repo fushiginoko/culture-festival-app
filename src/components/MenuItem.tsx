@@ -8,7 +8,7 @@ export type MenuItemProps = {
   onChange: (newCount: number) => void;
 };
 
-function MenuItem({ name, price, count, onChange }: MenuItemProps) {
+function MenuItem({ name, price, count, maxQuantity, onChange }: MenuItemProps) {
   const handleDecrement = () => {
     if (count > 0) onChange(count - 1);
   };
@@ -16,11 +16,16 @@ function MenuItem({ name, price, count, onChange }: MenuItemProps) {
     if (count < MAX_ITEM_QUANTITY) onChange(count + 1);
   };
 
+  const isSoldOut = maxQuantity <= 0;
+
   return (
     <article className="menu-item">
       <div className="menu-item__details">
         <h2 className="menu-item__name">{name}</h2>
         <p className="menu-item__price">¥{price.toLocaleString("ja-JP")}</p>
+        <p className="menu-item__stock">
+          {isSoldOut ? "売り切れ" : `残り${maxQuantity}個`}
+        </p>
       </div>
       <div className="stepper">
         <button

@@ -11,6 +11,7 @@ function MenuList(props: { items: MenuItemProps[] }) {
           name={item.name}
           price={item.price}
           count={item.count}
+          maxQuantity={item.maxQuantity}
           onChange={item.onChange}
         />
       ))}
