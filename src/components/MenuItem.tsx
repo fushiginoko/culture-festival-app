@@ -1,9 +1,7 @@
 import { MAX_ITEM_QUANTITY } from "../lib/constants";
+import type { MenuItem as MenuItemBase } from "../types";
 
-export type MenuItemProps = {
-  id: number;
-  name: string;
-  price: number;
+export type MenuItemProps = MenuItemBase & {
   count: number;
   onChange: (newCount: number) => void;
 };

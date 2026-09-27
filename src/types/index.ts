@@ -1,3 +1,10 @@
+export type MenuItem = {
+  id: number;
+  name: string;
+  price: number;
+  maxQuantity: number;
+};
+
 export type OrderItem = {
   id: number;
   name: string;

@@ -1,5 +1,15 @@
+import type { MenuItem } from "../types";
+
 /** 注文・チケットに関する業務ルール。 */
 export const MAX_ITEM_QUANTITY = 3;
+
+/** メニュー一覧の商品データ。 */
+// 仮の値
+export const MENU_DATA: MenuItem[] = [
+  { id: 1, name: "ハンバーガー", price: 300, maxQuantity: 200 },
+  { id: 2, name: "フライドチキン", price: 400, maxQuantity: 200 },
+  { id: 3, name: "ピザ", price: 500, maxQuantity: 200 },
+];
 export const AUTH_CODE_LENGTH = 6;
 export const TICKET_STORAGE_KEY = "bunkasai-order-ticket";
 
