@@ -264,6 +264,50 @@
   transition: opacity 0.12s ease, transform 0.12s ease;
 }
 
+/* ボタンと規約リンクをひとまとめにする領域 */
+.cart-summary__action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 黒背景に馴染む極小リーガルテキスト */
+.cart-summary__legal {
+  margin: 0;
+  color: rgb(255 255 255 / 0.45); /* 控えめな半透明白 */
+  font-size: 10px;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* リンクの上品な装飾（青文字をパージ！） */
+.cart-summary__legal a {
+  color: rgb(255 255 255 / 0.75);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  transition: color 0.15s ease;
+}
+
+.cart-summary__legal a:hover {
+  color: var(--surface); /* ホバーでクッキリ白 */
+}
+
+/* 小型スマホ用（430px以下）の微調整 */
+@media (max-width: 430px) {
+  .cart-summary__action {
+    width: 100%;
+  }
+
+  .cart-summary__legal {
+    font-size: 9.5px;
+    white-space: normal; /* 画面幅が狭すぎるときは自然に折り返し */
+  }
+}
+
 .cart-summary__button:hover:not(:disabled) {
   transform: translateY(-1px);
 }
