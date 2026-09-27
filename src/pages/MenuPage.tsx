@@ -6,8 +6,8 @@ import { useNavigate, Navigate } from "react-router-dom";
 import { readStoredTicket } from "../lib/ticketStorage";
 import { MENU_DATA } from "../lib/constants";
 import { fetchOrderedQuantities } from "../lib/stockApi";
+import OrderHeader from "../components/OrderHeader";
 import "./MenuPage.css";
-import tootLogo from "../assets/TOOT_logo.svg";
 
 function MenuPage() {
   const navigate = useNavigate();
@@ -73,15 +73,30 @@ function MenuPage() {
 
   return (
     <div className="menu-page">
+      <OrderHeader currentStep={1} />
+      <aside className="menu-sidebar">
+        <div className="menu-sidebar__message">
+          <p className="menu-eyebrow">会場で受け取る</p>
+          <h1>
+            できたてを、
+            <br />
+            会場で。
+          </h1>
+          <p>好きなメニューを選んで、受け取り時間を決めてください。</p>
+        </div>
+        <p className="menu-sidebar__note">ご注文後、画面に表示されるコードを大切に保管してください。</p>
+      </aside>
+
       <main className="menu-page__content">
         <header className="menu-header">
-          <div className="menu-header__logo-frame">
-            <img src={tootLogo} alt="" className="menu-header__logo" />
+          <div>
+            <p className="menu-eyebrow">TODAY'S MENU</p>
+            <h2>メニューを選ぶ</h2>
           </div>
-          <div className="menu-header__copy">
-            <h1 className="menu-header__logo">TOOT</h1>
-            <p className="menu-header__subtitle">三年生の出店・出来立て予約</p>
-          </div>
+          <span className="menu-open-label">
+            <span aria-hidden="true" />
+            受付中
+          </span>
         </header>
 
         <MenuList items={menuItems} />
