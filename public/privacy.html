@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>プライバシーポリシー | TOOT (Take Out Of Twelve)</title>
+  <style>
+    :root {
+      --bg: #f8f7f2;
+      --surface: #ffffff;
+      --ink: #191e1f;
+      --ink-soft: #555e60;
+      --line: #e2e0d8;
+      --brand-coral: #ff9f9f;
+      --brand-yellow: #ffe842;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--ink);
+      font-family: var(--font);
+      line-height: 1.75;
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+      padding: clamp(20px, 4vw, 40px) 16px;
+    }
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-top: 4px solid var(--brand-coral);
+      padding: clamp(24px, 5vw, 44px);
+    }
+    .header {
+      border-bottom: 2px solid var(--ink);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: var(--ink-soft);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    h1 {
+      font-size: clamp(20px, 3vw, 24px);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      line-height: 1.3;
+    }
+    .sub-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink-soft);
+      margin-top: 4px;
+    }
+    h2 {
+      font-size: 15px;
+      font-weight: 800;
+      margin-top: 26px;
+      margin-bottom: 10px;
+      padding-left: 10px;
+      border-left: 3px solid var(--ink);
+      line-height: 1.4;
+    }
+    h3 {
+      font-size: 13.5px;
+      font-weight: 800;
+      margin-top: 14px;
+      margin-bottom: 6px;
+      color: var(--ink);
+    }
+    p, ul, ol {
+      margin-bottom: 12px;
+      color: var(--ink);
+      font-size: 13.5px;
+    }
+    ul, ol { padding-left: 20px; }
+    li { margin-bottom: 6px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0 16px;
+      font-size: 13px;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 8px 12px;
+      text-align: left;
+    }
+    th {
+      background: var(--bg);
+      font-weight: 800;
+      width: 32%;
+    }
+    td {
+      background: var(--surface);
+    }
+    .close-btn {
+      display: inline-block;
+      margin-bottom: 16px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ink-soft);
+      text-decoration: none;
+      border: 1px solid var(--line);
+      padding: 4px 10px;
+      background: var(--surface);
+      cursor: pointer;
+    }
+    .close-btn:hover { background: var(--bg); color: var(--ink); }
+    .contact-card {
+      margin-top: 28px;
+      padding: 16px 18px;
+      background: var(--bg);
+      border: 1px solid var(--line);
+    }
+    .contact-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--ink);
+      margin-bottom: 12px;
+      letter-spacing: 0.04em;
+    }
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 8px 12px;
+      font-size: 12.5px;
+      line-height: 1.5;
+    }
+    .contact-grid dt {
+      color: var(--ink-soft);
+      font-weight: 700;
+    }
+    .contact-grid dd {
+      color: var(--ink);
+      margin: 0;
+    }
+    .footer {
+      margin-top: 36px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      font-size: 12px;
+      color: var(--ink-soft);
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <button class="close-btn" onclick="window.close()">← 画面を閉じる</button>
+    <div class="header">
+      <span class="badge">Privacy by Design</span>
+      <h1>TOOT プライバシーポリシー</h1>
+      <div class="sub-title">Zero-PII Policy（個人情報非取得宣言）</div>
+    </div>
+    
+    <p>TOOT 開発チーム（チーム MONO レール）（以下「開発チーム」といいます。）は、文化祭モバイルオーダーシステム『TOOT (Take Out Of Twelve)』（以下「本サービス」といいます。）におけるデータの取扱いについて、以下のとおり定めます。</p>
+
+    <h2>第1条（基本方針：Zero-PII 設計）</h2>
+    <ol>
+      <li>本サービスは、設計段階からプライバシーを保護する「Privacy by Design」に基づき、個人情報の保護に関する法律（以下「法」といいます。）第2条第1項に定める「個人情報」を、注文アプリケーションにおいて利用者に入力させず、データベースにも保存しない「Zero-PII」設計を採用しています。</li>
+      <li>アカウント登録およびログインは不要です。氏名、電話番号、メールアドレス、学年・クラスその他個人に関する情報の入力を求めることはありません。</li>
+      <li>本サービスは、個人情報を「適切に管理する」のではなく「そもそも持たない」ことを原則とします。</li>
+      <li>本ポリシーにいう「Zero-PII」は、注文アプリケーションの設計を指します。インターネット通信の性質上、インフラ層でIPアドレス等の技術的ログが一時的に生成される可能性まで否定するものではありません（第2条③）。</li>
+    </ol>
+
+    <h2>第2条（取り扱うデータ）</h2>
+    <p>本サービスが取り扱うデータは次の3種類に限られます。</p>
+
+    <h3>① 注文トランザクションデータ（サーバー側：Supabase）</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>項目</th>
+          <th>内容</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>受取時間スロットID</td>
+          <td>選択された受取時間枠の識別子</td>
+        </tr>
+        <tr>
+          <td>注文商品IDおよび数量</td>
+          <td>注文された商品と個数</td>
+        </tr>
+        <tr>
+          <td>受取コード</td>
+          <td>暗号論的擬似乱数生成器（CSPRNG）で生成される6桁の英数字（Crockford's Base32）</td>
+        </tr>
+      </tbody>
+    </table>
+    <ul>
+      <li>受取コードは個々の注文に付与される一時的な記号であり、特定の個人に割り当てられるものではありません。</li>
+      <li>これらのデータは、注文管理、商品の引渡し、調理数の集計にのみ使用します。</li>
+    </ul>
+
+    <h3>② 端末内ローカルデータ（クライアント側：LocalStorage）</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>項目</th>
+          <th>内容</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>受取コード</td>
+          <td>発行された6桁の受取コード</td>
+        </tr>
+        <tr>
+          <td>注文概要</td>
+          <td>注文内容および受取時間枠の控え</td>
+        </tr>
+      </tbody>
+    </table>
+    <ul>
+      <li>これらのデータは利用者のブラウザ内にのみ保存され、開発チームが収集することはありません。</li>
+      <li>開発チームは、利用者の端末内のデータを遠隔で閲覧・削除できません。</li>
+    </ul>
+
+    <h3>③ 通信に伴う技術的ログ（インフラ層）</h3>
+    <ul>
+      <li>アクセスに伴い、ホスティング基盤等でIPアドレス、アクセス日時、ブラウザ情報等が一時的に記録される場合があります。</li>
+      <li>これらのログは、サイバー攻撃対策、不正アクセス防止、障害調査にのみ用います。</li>
+      <li>開発チームは、これらのログを注文データと照合・紐づけして個人を特定・追跡することは行いません。</li>
+      <li>保存期間は各基盤事業者の定めに従います。</li>
+    </ul>
+
+    <h2>第3条（利用目的の限定）</h2>
+    <p>前条のデータは、次の目的の範囲内でのみ利用します。</p>
+    <ol>
+      <li>注文の受付、管理および商品の引渡し</li>
+      <li>受取時間ごとの調理数・販売数の集計</li>
+      <li>不正操作の防止、障害対応および本サービスの安定運用</li>
+    </ol>
+    <p>※広告配信、行動追跡、プロファイリングには一切利用しません。</p>
+
+    <h2>第4条（トラッキング技術の不使用）</h2>
+    <p>本サービスは、第三者のアクセス解析ツール、広告配信ツールその他のトラッキング技術を組み込んでいません。</p>
+
+    <h2>第5条（第三者提供および外部サービス）</h2>
+    <ol>
+      <li>開発チームは、第2条のデータを第三者に販売、貸与または提供しません。</li>
+      <li>本サービスは、データの保存・配信のため Supabase 等のクラウド基盤を利用しています。これらの事業者は、運用に必要な範囲でのみデータを取り扱います。</li>
+      <li>技術的ログについては、法令に基づく開示が求められた場合、または人の生命・身体・財産の保護に必要な場合に限り、関係機関に提供することがあります。</li>
+    </ol>
+
+    <h2>第6条（安全管理）</h2>
+    <ol>
+      <li>データベースへのアクセス権限を必要最小限に限定し、不正アクセス、改ざんおよび漏えいの防止に努めます。</li>
+      <li>受取コードは、商品引渡し時に注文を照合する唯一の手段です。受取までの間、他者に知られないよう管理してください。</li>
+    </ol>
+
+    <h2>第7条（保存期間および削除）</h2>
+    <ol>
+      <li>注文トランザクションデータは、文化祭会期終了後、速やかに集計を終えて完全に破棄・削除します。</li>
+      <li>端末内ローカルデータは、利用者がブラウザのサイトデータを消去することで、いつでも削除できます。</li>
+    </ol>
+
+    <h2>第8条（開示等の請求について）</h2>
+    <p>本サービスの注文データベースは、特定の個人を識別できる情報を保有しません。そのため、法第33条から第35条までに定める開示・訂正等・利用停止等の対象となる保有個人データは、注文データについては存在しません。データの取扱いに関するご質問には、第10条の窓口で誠実に対応します。</p>
+
+    <h2>第9条（本ポリシーの改定）</h2>
+    <ol>
+      <li>本ポリシーは必要に応じて改定することがあり、改定後の内容は本サービス上に掲載した時点から効力を生じます。</li>
+      <li>第1条の基本方針を変更し、個人情報を取得することとなる場合は、事前に本サービス上でその旨を明示します。</li>
+    </ol>
+
+    <h2>第10条（お問い合わせ）</h2>
+    <div class="contact-card">
+      <div class="contact-title">お問い合わせ窓口</div>
+      <dl class="contact-grid">
+        <dt>運営主体</dt>
+        <dd>TOOT 開発チーム（チーム MONO レール）</dd>
+        <dt>所属校</dt>
+        <dd>文化祭 出店店舗</dd>
+        <dt>出店場所</dt>
+        <dd>校内展示場所・店舗受付窓口</dd>
+        <dt>連絡先</dt>
+        <dd>出店窓口、またはプロジェクト所定の連絡先</dd>
+      </dl>
+    </div>
+
+    <div class="footer">
+      TOOT 開発チーム（チーム MONO レール）
+    </div>
+  </div>
+</body>
+</html>
